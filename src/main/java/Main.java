@@ -1,5 +1,7 @@
 import pagination.Pagination;
 import pagination.Paginator;
+import songsManager.Song;
+import tablesCreation.SongsCreation;
 import usersClasses.User;
 import authentication.*;
 
@@ -12,6 +14,9 @@ public class Main {
     public static void main(String[] args) {
         UsersCreation usersCreation = new UsersCreation();
         List<User> users = new ArrayList<>(UsersCreation.getAllUsers());
+
+        SongsCreation songsCreation = new SongsCreation();
+        List<Song> songs = new ArrayList<>(SongsCreation.getAllSongs());
 
         SessionManager session = new SessionManager();
         Authentication auth = new Authentication(session);
@@ -38,7 +43,7 @@ public class Main {
                     action = new PromoteCommand(auth, users, session, usersCreation);
                     break;
                 case "5":
-                    Paginator<User> paginator = new Paginator<>(users, itemsPerPage);
+                    Paginator<Song> paginator = new Paginator<>(songs, itemsPerPage);
                     paginator.paginate();
                 case "6":
                     return;
