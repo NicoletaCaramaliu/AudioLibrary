@@ -1,3 +1,5 @@
+package tablesCreation;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -7,13 +9,22 @@ public class DatabaseConnection {
     private static final String USERNAME = "student";
     private static final String PASSWORD = "student";
 
-    private Connection connection;
 
     public DatabaseConnection() {
         try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
         } catch (SQLException e) {
             System.out.println("Error connecting to database: " + e.getMessage());
+        }
+    }
+
+    public Connection getCurrentConnection() {
+        try {
+            return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        } catch (SQLException e) {
+            System.out.println("Error connecting to database: " + e.getMessage());
+            return null;
         }
     }
 }

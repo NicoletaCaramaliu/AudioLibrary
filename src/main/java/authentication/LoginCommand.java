@@ -1,6 +1,6 @@
 package authentication;
 
-import UsersClasses.User;
+import usersClasses.User;
 
 import java.util.List;
 import java.util.Scanner;

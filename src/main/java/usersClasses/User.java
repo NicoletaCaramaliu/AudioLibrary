@@ -1,4 +1,4 @@
-package UsersClasses;
+package usersClasses;
 
 import lombok.Getter;
 

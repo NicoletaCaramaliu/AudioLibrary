@@ -1,9 +1,8 @@
 package authentication;
 
-import UsersClasses.User;
+import usersClasses.User;
 import tablesCreation.UsersCreation;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 

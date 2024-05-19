@@ -1,6 +1,6 @@
 package tablesCreation;
 
-import UsersClasses.User;
+import usersClasses.User;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
