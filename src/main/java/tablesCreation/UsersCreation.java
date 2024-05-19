@@ -141,7 +141,4 @@ public class UsersCreation {
         }
     }
 
-    public static void main(String[] args) {
-        insertUserData();
-    }
 }

@@ -47,8 +47,6 @@ public class Authentication {
 
             for (User user : users) {
                 if (user.getUsername().equals(username)) {
-                    System.out.println(
-                            "User with given username already exists! Please try again!");
                     return null;
                 }
             }
@@ -84,5 +82,9 @@ public class Authentication {
         }
 
         return null;
+    }
+
+    public SessionManager getSession() {
+        return session;
     }
 }
