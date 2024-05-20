@@ -111,12 +111,12 @@ public class SongsCreation {
             String sql = "INSERT INTO Songs (song_name, artist, release_year) VALUES (?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            statement.setString(1, newSong.getTitle());
-            statement.setString(2, newSong.getArtist());
-            statement.setInt(3, newSong.getReleaseYear());
+            statement.setString(1, newSong.title());
+            statement.setString(2, newSong.artist());
+            statement.setInt(3, newSong.releaseYear());
             statement.executeUpdate();
 
-            System.out.println("Song " + newSong.getTitle() + " inserted successfully");
+            System.out.println("Song " + newSong.title() + " inserted successfully");
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println("This song is already part of the library!");
         } catch (SQLException e) {

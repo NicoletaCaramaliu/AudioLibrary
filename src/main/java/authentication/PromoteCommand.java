@@ -3,7 +3,6 @@ package authentication;
 import java.util.List;
 import java.util.Scanner;
 import tablesCreation.UsersCreation;
-import usersClasses.User;
 
 public class PromoteCommand implements Command {
     private final Authentication authentication;

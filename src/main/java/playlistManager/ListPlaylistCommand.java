@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 import pagination.Paginator;
 
 public class ListPlaylistCommand implements Command {
-    private List<Playlist> playlists;
-    private int itemsPerPage;
-    private int currentUserId;
+    private final List<Playlist> playlists;
+    private final int itemsPerPage;
+    private final int currentUserId;
 
     public ListPlaylistCommand(List<Playlist> playlists, int itemsPerPage, int userId) {
         this.playlists = playlists;

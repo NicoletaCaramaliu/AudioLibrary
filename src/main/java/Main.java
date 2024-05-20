@@ -3,17 +3,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import pagination.Paginator;
-import playlistManager.CreatePlaylist;
-import playlistManager.CreatePlaylistCommand;
-import playlistManager.ListPlaylistCommand;
-import playlistManager.Playlist;
+import playlistManager.*;
 import songsManager.CreateSong;
 import songsManager.CreateSongCommand;
+import songsManager.SearchCommand;
 import songsManager.Song;
 import tablesCreation.PlaylistCreation;
 import tablesCreation.SongsCreation;
 import tablesCreation.UsersCreation;
-import usersClasses.User;
+import authentication.User;
 
 public class Main {
     public static void main(String[] args) {
@@ -40,7 +38,7 @@ public class Main {
         while (true) {
             System.out.print(
                     "Enter command: 1. login 2. register 3. logout 4. promote 5.view songs 6.create"
-                            + " song 7.create playlist 8. List playlists 9.exit\n");
+                            + " song 7.create playlist 8. list playlists 9. add song to playlist 10.search song 11.exit\n");
             String command = scanner.nextLine();
 
             Command action;
@@ -78,6 +76,20 @@ public class Main {
                                     playlists, itemsPerPage, session.getCurrentUser().getUserId());
                     break;
                 case "9":
+                    action = new AddSongToPlaylistCommand(playlists, songs, playlistCreation, songsCreation, session, scanner);
+                    break;
+                case "10":
+                    if(session.getCurrentUser() == null) {
+                        System.out.println("You need to be logged in to search songs.");
+                        continue;
+                    }
+                    System.out.print("Enter search type (author/name): ");
+                    String searchType = scanner.nextLine();
+                    System.out.print("Enter search criteria: ");
+                    String searchCriteria = scanner.nextLine();
+                    action = new SearchCommand(songs, itemsPerPage, searchType, searchCriteria);
+                    break;
+                case "11":
                     return;
                 default:
                     System.out.println("Unknown command.");

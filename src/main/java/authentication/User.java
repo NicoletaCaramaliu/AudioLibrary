@@ -1,4 +1,4 @@
-package usersClasses;
+package authentication;
 
 import lombok.Getter;
 

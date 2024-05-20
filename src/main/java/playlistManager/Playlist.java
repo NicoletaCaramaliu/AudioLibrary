@@ -1,11 +1,16 @@
 package playlistManager;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Playlist {
+    @Getter
     private final int id;
+    @Getter
     private final String name;
+    @Getter
     private final int userId;
     private final List<Integer> songIds;
 
@@ -16,21 +21,6 @@ public class Playlist {
         this.songIds = new ArrayList<>();
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public List<Integer> getSongIds() {
-        return songIds;
-    }
 
     public void addSong(int songId) {
         songIds.add(songId);

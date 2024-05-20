@@ -2,7 +2,6 @@ package playlistManager;
 
 import authentication.SessionManager;
 import java.util.List;
-import tablesCreation.PlaylistCreation;
 
 public class CreatePlaylist {
     private final SessionManager sessionManager;
@@ -12,7 +11,7 @@ public class CreatePlaylist {
     }
 
     public Playlist addPlaylistToUser(
-            List<Playlist> playlists, String name, PlaylistCreation playlistCreation) {
+            List<Playlist> playlists, String name) {
 
         for (Playlist playlist : playlists) {
             if (playlist.getName().equals(name)

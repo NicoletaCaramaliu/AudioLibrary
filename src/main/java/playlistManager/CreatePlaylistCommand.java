@@ -33,7 +33,7 @@ public class CreatePlaylistCommand implements Command {
         System.out.print("Enter playlist name: ");
         String playlistName = scanner.nextLine();
         Playlist newPlaylist =
-                createPlaylist.addPlaylistToUser(playlists, playlistName, playlistCreation);
+                createPlaylist.addPlaylistToUser(playlists, playlistName);
         if (newPlaylist != null) {
             playlists.add(newPlaylist);
             playlistCreation.insertPlaylist(newPlaylist);

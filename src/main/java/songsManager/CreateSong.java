@@ -20,7 +20,7 @@ public class CreateSong {
         if (!sessionManager.isAnonymous()) {
             if (sessionManager.isAdmin()) {
                 for (Song song : songs) {
-                    if (song.getTitle().equals(title) && song.getArtist().equals(artist)) {
+                    if (song.title().equals(title) && song.artist().equals(artist)) {
                         System.out.println("Song already exists in the library.");
                         return null;
                     }

@@ -2,7 +2,6 @@ package authentication;
 
 import java.util.List;
 import java.util.Scanner;
-import usersClasses.User;
 
 public class LoginCommand implements Command {
     private final Authentication auth;

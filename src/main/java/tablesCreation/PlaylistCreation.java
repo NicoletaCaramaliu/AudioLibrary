@@ -46,23 +46,6 @@ public class PlaylistCreation {
         }
     }
 
-    public static void createPlaylist(String playlistName, int userId) {
-        try {
-            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            String insertSQL = "INSERT INTO Playlists (playlist_name, user_id) VALUES (?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.setString(1, playlistName);
-            preparedStatement.setInt(2, userId);
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Playlist " + playlistName + " was created successfully!");
-            } else {
-                System.out.println("Failed to create playlist " + playlistName);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error creating playlist: " + e.getMessage());
-        }
-    }
 
     public static List<Playlist> getAllPlaylists() {
         List<Playlist> playlists = new ArrayList<>();
@@ -96,6 +79,19 @@ public class PlaylistCreation {
             System.out.println("Playlist " + newPlaylist.getName() + " inserted successfully");
         } catch (SQLException e) {
             System.err.println("Error inserting playlist: " + e.getMessage());
+        }
+    }
+
+    public void insertPlaylistSong(int playlistId, int songId) {
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+            String sql = "INSERT INTO PlaylistSongs (playlist_id, song_id) VALUES (?, ?)";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, playlistId);
+            statement.setInt(2, songId);
+            statement.executeUpdate();
+            System.out.println("Song with ID " + songId + " added to playlist with ID " + playlistId + " successfully.");
+        } catch (SQLException e) {
+            System.err.println("Error inserting song into playlist: " + e.getMessage());
         }
     }
 }

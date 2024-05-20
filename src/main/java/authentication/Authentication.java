@@ -2,7 +2,6 @@ package authentication;
 
 import java.util.List;
 import java.util.Objects;
-import usersClasses.User;
 
 public record Authentication(SessionManager session) implements AuthInterface {
 
