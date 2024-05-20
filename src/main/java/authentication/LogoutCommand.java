@@ -1,6 +1,6 @@
 package authentication;
 
-public class LogoutCommand implements Command{
+public class LogoutCommand implements Command {
     private final Authentication authentication;
 
     public LogoutCommand(Authentication authentication) {

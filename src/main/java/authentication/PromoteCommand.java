@@ -1,18 +1,21 @@
 package authentication;
 
-import usersClasses.User;
-import tablesCreation.UsersCreation;
-
 import java.util.List;
 import java.util.Scanner;
+import tablesCreation.UsersCreation;
+import usersClasses.User;
 
-public class PromoteCommand implements Command{
+public class PromoteCommand implements Command {
     private final Authentication authentication;
     private final List<User> users;
     private final SessionManager session;
     private final UsersCreation usersCreation;
 
-    public PromoteCommand(Authentication authentication, List<User> users, SessionManager session, UsersCreation usersCreation) {
+    public PromoteCommand(
+            Authentication authentication,
+            List<User> users,
+            SessionManager session,
+            UsersCreation usersCreation) {
         this.authentication = authentication;
         this.users = users;
         this.session = session;
@@ -26,7 +29,8 @@ public class PromoteCommand implements Command{
             return;
         }
         if (!session.isAdmin()) {
-            System.out.println("You do not have permission to promote. You are not an administrator.");
+            System.out.println(
+                    "You do not have permission to promote. You are not an administrator.");
             return;
         }
         Scanner scanner = new Scanner(System.in);

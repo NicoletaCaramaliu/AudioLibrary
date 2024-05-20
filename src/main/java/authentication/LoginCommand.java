@@ -1,11 +1,10 @@
 package authentication;
 
-import usersClasses.User;
-
 import java.util.List;
 import java.util.Scanner;
+import usersClasses.User;
 
-public class LoginCommand implements Command{
+public class LoginCommand implements Command {
     private final Authentication auth;
     private final List<User> users;
     private final Scanner scanner;

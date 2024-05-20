@@ -1,17 +1,17 @@
 package authentication;
 
-import usersClasses.User;
-import tablesCreation.UsersCreation;
-
 import java.util.List;
 import java.util.Scanner;
+import tablesCreation.UsersCreation;
+import usersClasses.User;
 
-public class RegisterCommand implements Command{
+public class RegisterCommand implements Command {
     private final Authentication authentication;
     private final List<User> users;
     private final UsersCreation usersCreation;
 
-    public RegisterCommand(Authentication authentication, List<User> users, UsersCreation usersCreation) {
+    public RegisterCommand(
+            Authentication authentication, List<User> users, UsersCreation usersCreation) {
         this.authentication = authentication;
         this.users = users;
         this.usersCreation = usersCreation;
@@ -19,7 +19,7 @@ public class RegisterCommand implements Command{
 
     @Override
     public void execute() {
-        if (!authentication.getSession().isAnonymous()) {
+        if (!authentication.session().isAnonymous()) {
             System.out.println("You are already logged in.");
             return;
         }
@@ -27,8 +27,10 @@ public class RegisterCommand implements Command{
         System.out.println("Enter username: ");
         String username = scanner.nextLine();
         System.out.println("Enter password: ");
+        String email = scanner.nextLine();
+        System.out.println("Enter email: ");
         String password = scanner.nextLine();
-        User newUser = authentication.register(users, username, password);
+        User newUser = authentication.register(users, username, password, email);
         if (newUser != null) {
             usersCreation.insertUser(newUser);
             users.add(newUser);

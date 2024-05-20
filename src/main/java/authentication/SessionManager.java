@@ -1,8 +1,8 @@
 package authentication;
 
-import usersClasses.User;
 import lombok.Getter;
 import lombok.Setter;
+import usersClasses.User;
 
 @Setter
 @Getter

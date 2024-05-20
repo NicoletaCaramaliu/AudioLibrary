@@ -1,9 +1,9 @@
 package tablesCreation;
 
-import usersClasses.User;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import usersClasses.User;
 
 public class UsersCreation {
     private static final String URL = "jdbc:mysql://localhost:3306/laborator";
@@ -140,5 +140,4 @@ public class UsersCreation {
             System.err.println("Error updating user: " + e.getMessage());
         }
     }
-
 }

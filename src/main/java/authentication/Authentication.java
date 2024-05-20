@@ -1,15 +1,10 @@
 package authentication;
 
-import usersClasses.User;
 import java.util.List;
 import java.util.Objects;
+import usersClasses.User;
 
-public class Authentication {
-    private final SessionManager session;
-
-    public Authentication(SessionManager session) {
-        this.session = session;
-    }
+public record Authentication(SessionManager session) implements AuthInterface {
 
     public String login(List<User> users, String username, String password) {
         if (!session.isAnonymous()) {
@@ -26,16 +21,10 @@ public class Authentication {
         return "Username or password is invalid. Please try again!";
     }
 
-    public User register(List<User> users, String username, String password) {
+    public User register(List<User> users, String username, String password, String email) {
         if (users.isEmpty()) {
             // Daca baza de date este goala, setam utilizatorul nou ca administrator
-            User newUser =
-                    new User(
-                            0,
-                            username,
-                            password,
-                            username + "@gmail.com",
-                            true); // Setare ca administrator
+            User newUser = new User(0, username, password, email, true); // Setare ca administrator
             session.setCurrentUser(newUser); // Setare utilizator curent in sesiune
             System.out.println(
                     "Registered account with user name "
@@ -52,7 +41,7 @@ public class Authentication {
             }
 
             // Register the new user
-            User newUser = new User(0, username, password, username + "@gmail.com", false);
+            User newUser = new User(0, username, password, email, false);
             session.setCurrentUser(newUser);
             System.out.println(
                     "Registered account with user name "
@@ -82,9 +71,5 @@ public class Authentication {
         }
 
         return null;
-    }
-
-    public SessionManager getSession() {
-        return session;
     }
 }

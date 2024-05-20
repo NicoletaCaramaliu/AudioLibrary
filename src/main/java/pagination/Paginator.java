@@ -20,7 +20,11 @@ public class Paginator<T> {
         while (true) {
             List<T> page = Pagination.getPage(items, currentPage, itemsPerPage);
             page.forEach(item -> System.out.println(item.toString()));
-            System.out.println("\nPage " + currentPage + " of " + Pagination.getTotalPages(items, itemsPerPage));
+            System.out.println(
+                    "\nPage "
+                            + currentPage
+                            + " of "
+                            + Pagination.getTotalPages(items, itemsPerPage));
             System.out.print("Enter command: n (next), p (previous), q (quit)\n");
             String navCommand = scanner.nextLine();
             switch (navCommand) {
