@@ -125,7 +125,7 @@ public class AddSongToPlaylistCommand implements Command{
         }
 
         songsToAdd.forEach(song -> {
-            playlist.addSong(song.songId());
+            playlist.addSong(song);
             playlistCreation.insertPlaylistSong(playlist.getId(), song.songId());
             System.out.println("Added \"" + song.title() + "\" by " + song.artist() + " to " + playlist.getName() + ".");
         });

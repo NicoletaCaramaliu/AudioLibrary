@@ -1,33 +1,32 @@
 package playlistManager;
 
 import lombok.Getter;
+import songsManager.Song;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Getter
 public class Playlist {
-    @Getter
     private final int id;
     @Getter
     private final String name;
-    @Getter
     private final int userId;
-    private final List<Integer> songIds;
+    private final List<Song> songs;
 
     public Playlist(int id, String name, int userId) {
         this.id = id;
         this.name = name;
         this.userId = userId;
-        this.songIds = new ArrayList<>();
+        this.songs = new ArrayList<>();
     }
 
 
-    public void addSong(int songId) {
-        songIds.add(songId);
+    public void addSong(Song song) {
+        songs.add(song);
     }
 
     public boolean containsSong(int songId) {
-        return songIds.contains(songId);
+        return songs.stream().anyMatch(song -> song.getId() == songId);
     }
 
     @Override
@@ -36,7 +35,8 @@ public class Playlist {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", userId=" + userId +
-                ", songIds=" + songIds +
+                ", songs=" + songs +
                 '}';
     }
+
 }

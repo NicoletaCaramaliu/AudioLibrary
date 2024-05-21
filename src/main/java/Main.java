@@ -67,13 +67,11 @@ public class Main {
                                     playlists, createPlaylist, playlistCreation, session);
                     break;
                 case "8":
-                    if(session.getCurrentUser() == null) {
+                    if (session.getCurrentUser() == null) {
                         System.out.println("You need to be logged in to view your playlists.");
                         continue;
                     }
-                    action =
-                            new ListPlaylistCommand(
-                                    playlists, itemsPerPage, session.getCurrentUser().getUserId());
+                    action = new ListPlaylistCommand(itemsPerPage, session.getCurrentUser().getUserId(), playlistCreation);
                     break;
                 case "9":
                     action = new AddSongToPlaylistCommand(playlists, songs, playlistCreation, songsCreation, session, scanner);

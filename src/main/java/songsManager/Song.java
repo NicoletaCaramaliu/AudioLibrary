@@ -19,4 +19,8 @@ public record Song(int songId, String title, String artist, int releaseYear) {
                 + releaseYear
                 + '}';
     }
+
+    public int getId() {
+        return songId;
+    }
 }
