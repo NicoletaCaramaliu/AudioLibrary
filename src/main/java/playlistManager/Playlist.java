@@ -26,7 +26,7 @@ public class Playlist {
     }
 
     public boolean containsSong(int songId) {
-        return songs.stream().anyMatch(song -> song.getId() == songId);
+        return songs.stream().anyMatch(song -> song.songId() == songId);
     }
 
     @Override

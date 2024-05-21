@@ -1,0 +1,30 @@
+{
+  "playlist": "Pop",
+  "songs": [
+    {
+      "name": "Shape of You",
+      "artist": "Ed Sheeran",
+      "releaseYear": 2017
+    },
+    {
+      "name": "Perfect",
+      "artist": "Ed Sheeran",
+      "releaseYear": 2017
+    },
+    {
+      "name": "Thinking Out Loud",
+      "artist": "Ed Sheeran",
+      "releaseYear": 2014
+    },
+    {
+      "name": "Billie Jean",
+      "artist": "Michael Jackson",
+      "releaseYear": 1983
+    },
+    {
+      "name": "Beat It",
+      "artist": "Michael Jackson",
+      "releaseYear": 1982
+    }
+  ]
+}

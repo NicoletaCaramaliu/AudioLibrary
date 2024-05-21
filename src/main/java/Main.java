@@ -2,6 +2,9 @@ import authentication.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import exportPlaylist.ExportFormat;
+import exportPlaylist.ExportPlaylistCommand;
 import pagination.Paginator;
 import playlistManager.*;
 import songsManager.CreateSong;
@@ -38,7 +41,7 @@ public class Main {
         while (true) {
             System.out.print(
                     "Enter command: 1. login 2. register 3. logout 4. promote 5.view songs 6.create"
-                            + " song 7.create playlist 8. list playlists 9. add song to playlist 10.search song 11.exit\n");
+                            + " song 7.create playlist 8. list playlists 9. add song to playlist 10.search song 11.export playlist 12.exit\n");
             String command = scanner.nextLine();
 
             Command action;
@@ -88,7 +91,24 @@ public class Main {
                     action = new SearchCommand(songs, itemsPerPage, searchType, searchCriteria);
                     break;
                 case "11":
-                    return;
+                    if (session.getCurrentUser() == null) {
+                        System.out.println("You need to be logged in to export playlists.");
+                        continue;
+                    }
+                    System.out.print("Enter playlist name or ID: ");
+                    String playlistIdentifier = scanner.nextLine();
+                    System.out.print("Enter export format (CSV/JSON): ");
+                    String formatString = scanner.nextLine().toUpperCase();
+                    ExportFormat format;
+                    try {
+                        format = ExportFormat.valueOf(formatString);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Invalid format specified. Please enter CSV or JSON.");
+                        continue;
+                    }
+                    action = new ExportPlaylistCommand(playlistIdentifier, format, session.getCurrentUser().getUserId(), playlistCreation, session.getCurrentUser().getUsername());
+                    break;
+                case "12":
                 default:
                     System.out.println("Unknown command.");
                     continue;

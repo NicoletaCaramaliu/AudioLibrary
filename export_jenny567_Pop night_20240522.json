@@ -1,0 +1,15 @@
+{
+  "playlist": "Pop night",
+  "songs": [
+    {
+      "name": "Shape of You",
+      "artist": "Ed Sheeran",
+      "releaseYear": 2017
+    },
+    {
+      "name": "Perfect",
+      "artist": "Ed Sheeran",
+      "releaseYear": 2017
+    }
+  ]
+}

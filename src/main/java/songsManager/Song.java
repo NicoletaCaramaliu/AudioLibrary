@@ -1,6 +1,5 @@
 package songsManager;
 
-
 public record Song(int songId, String title, String artist, int releaseYear) {
 
 
@@ -20,7 +19,5 @@ public record Song(int songId, String title, String artist, int releaseYear) {
                 + '}';
     }
 
-    public int getId() {
-        return songId;
-    }
+
 }
