@@ -3,6 +3,9 @@ package songsManager;
 import authentication.Command;
 import java.util.List;
 import java.util.Scanner;
+
+import exceptions.InvalidSessionException;
+import exceptions.InvalidSongException;
 import tablesCreation.SongsCreation;
 
 public class CreateSongCommand implements Command {
@@ -25,12 +28,13 @@ public class CreateSongCommand implements Command {
         String artist = scanner.nextLine();
         System.out.print("Enter release year: ");
         int releaseYear = Integer.parseInt(scanner.nextLine());
-
-        Song newSong =
-                createSong.addSongToLibrary(songs, songName, artist, releaseYear, songsCreation);
-        if (newSong != null) {
-            songs.add(newSong);
-            songsCreation.insertSong(newSong);
+        try {
+            Song newSong =
+                    createSong.addSongToLibrary(songs, songName, artist, releaseYear, songsCreation);
+                songs.add(newSong);
+                songsCreation.insertSong(newSong);
+        } catch (InvalidSongException | InvalidSessionException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

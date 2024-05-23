@@ -1,5 +1,7 @@
 package authentication;
 
+import users.Roles;
+import users.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +19,6 @@ public class SessionManager {
     }
 
     public boolean isAdmin() {
-        return currentUser != null && currentUser.getIsAdministrator();
+        return currentUser != null && currentUser.getRole() == Roles.ADMINISTRATOR;
     }
 }

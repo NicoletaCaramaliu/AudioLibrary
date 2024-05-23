@@ -4,6 +4,8 @@ import authentication.Command;
 import authentication.SessionManager;
 import java.util.List;
 import java.util.Scanner;
+
+import exceptions.InvalidPlaylistException;
 import tablesCreation.PlaylistCreation;
 
 public class CreatePlaylistCommand implements Command {
@@ -32,11 +34,14 @@ public class CreatePlaylistCommand implements Command {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter playlist name: ");
         String playlistName = scanner.nextLine();
-        Playlist newPlaylist =
+        try {
+            Playlist newPlaylist =
                 createPlaylist.addPlaylistToUser(playlists, playlistName);
-        if (newPlaylist != null) {
+
             playlists.add(newPlaylist);
             playlistCreation.insertPlaylist(newPlaylist);
+        } catch(InvalidPlaylistException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

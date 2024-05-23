@@ -14,15 +14,12 @@ import songsManager.Song;
 import tablesCreation.PlaylistCreation;
 import tablesCreation.SongsCreation;
 import tablesCreation.UsersCreation;
-import authentication.User;
+import users.User;
 
 public class Main {
     public static void main(String[] args) {
         UsersCreation usersCreation = new UsersCreation();
         List<User> users = new ArrayList<>(UsersCreation.getAllUsers());
-        for (User user : users) {
-            System.out.println(user);
-        }
 
         SongsCreation songsCreation = new SongsCreation();
         List<Song> songs = new ArrayList<>(SongsCreation.getAllSongs());
@@ -40,8 +37,8 @@ public class Main {
 
         while (true) {
             System.out.print(
-                    "Enter command: 1. login 2. register 3. logout 4. promote 5.view songs 6.create"
-                            + " song 7.create playlist 8. list playlists 9. add song to playlist 10.search song 11.export playlist 12.exit\n");
+                    "Enter command: \n1. login\n2. register \n3. logout \n4. promote \n5. create"
+                            + " song \n6. create playlist \n7. list playlists \n8. add song to playlist \n9. search song \n10. export playlist \n11. exit\n");
             String command = scanner.nextLine();
 
             Command action;
@@ -59,27 +56,24 @@ public class Main {
                     action = new PromoteCommand(auth, users, session, usersCreation);
                     break;
                 case "5":
-                    Paginator<Song> paginator = new Paginator<>(songs, itemsPerPage);
-                    paginator.paginate();
-                case "6":
                     action = new CreateSongCommand(songs, createSong, songsCreation);
                     break;
-                case "7":
+                case "6":
                     action =
                             new CreatePlaylistCommand(
                                     playlists, createPlaylist, playlistCreation, session);
                     break;
-                case "8":
+                case "7":
                     if (session.getCurrentUser() == null) {
                         System.out.println("You need to be logged in to view your playlists.");
                         continue;
                     }
                     action = new ListPlaylistCommand(itemsPerPage, session.getCurrentUser().getUserId(), playlistCreation);
                     break;
-                case "9":
+                case "8":
                     action = new AddSongToPlaylistCommand(playlists, songs, playlistCreation, songsCreation, session, scanner);
                     break;
-                case "10":
+                case "9":
                     if(session.getCurrentUser() == null) {
                         System.out.println("You need to be logged in to search songs.");
                         continue;
@@ -90,7 +84,7 @@ public class Main {
                     String searchCriteria = scanner.nextLine();
                     action = new SearchCommand(songs, itemsPerPage, searchType, searchCriteria);
                     break;
-                case "11":
+                case "10":
                     if (session.getCurrentUser() == null) {
                         System.out.println("You need to be logged in to export playlists.");
                         continue;
@@ -108,12 +102,17 @@ public class Main {
                     }
                     action = new ExportPlaylistCommand(playlistIdentifier, format, session.getCurrentUser().getUserId(), playlistCreation, session.getCurrentUser().getUsername());
                     break;
-                case "12":
+                case "11":
+                    return;
                 default:
                     System.out.println("Unknown command.");
                     continue;
             }
-            action.execute();
+            try {
+                action.execute();
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid usage of command " + command);
+            }
         }
     }
 }

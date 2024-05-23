@@ -1,5 +1,7 @@
 package authentication;
 
+import users.User;
+
 import java.util.List;
 
 public interface AuthInterface {

@@ -2,6 +2,8 @@ package songsManager;
 
 import authentication.SessionManager;
 import java.util.List;
+
+import exceptions.InvalidSongException;
 import tablesCreation.SongsCreation;
 
 public class CreateSong {
@@ -21,22 +23,17 @@ public class CreateSong {
             if (sessionManager.isAdmin()) {
                 for (Song song : songs) {
                     if (song.title().equals(title) && song.artist().equals(artist)) {
-                        System.out.println("Song already exists in the library.");
-                        return null;
+                        throw new InvalidSongException("Song already exists in the library.");
                     }
                 }
                 Song newSong = new Song(songs.size() + 1, title, artist, releaseYear);
-                songs.add(newSong);
-                songsCreation.insertSong(newSong);
                 System.out.println("Added " + title + " by " + artist + " to the library.");
                 return newSong;
             } else {
-                System.out.println("You need to be an admin to add a song");
+                throw new InvalidSongException("You need to be an admin to add a song");
             }
         } else {
-            System.out.println("You need to be logged in to add a song");
-            return null;
+            throw new InvalidSongException("You need to be logged in to add a song");
         }
-        return null;
     }
 }

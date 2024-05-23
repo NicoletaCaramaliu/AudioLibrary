@@ -1,6 +1,8 @@
 package playlistManager;
 
 import authentication.SessionManager;
+import exceptions.InvalidPlaylistException;
+
 import java.util.List;
 
 public class CreatePlaylist {
@@ -16,8 +18,7 @@ public class CreatePlaylist {
         for (Playlist playlist : playlists) {
             if (playlist.getName().equals(name)
                     && playlist.getUserId() == sessionManager.getCurrentUser().getUserId()) {
-                System.out.println("You already have a playlist named " + name);
-                return null;
+                throw new InvalidPlaylistException("Playlist with name " + name + " already exists.");
             }
         }
         Playlist newPlaylist =

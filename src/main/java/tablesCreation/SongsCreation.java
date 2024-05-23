@@ -117,8 +117,6 @@ public class SongsCreation {
             statement.executeUpdate();
 
             System.out.println("Song " + newSong.title() + " inserted successfully");
-        } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("This song is already part of the library!");
         } catch (SQLException e) {
             System.err.println("Error inserting song: " + e.getMessage());
         }

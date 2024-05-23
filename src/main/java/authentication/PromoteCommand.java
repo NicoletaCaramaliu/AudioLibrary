@@ -2,6 +2,9 @@ package authentication;
 
 import java.util.List;
 import java.util.Scanner;
+
+import users.User;
+import exceptions.InvalidCredentialsException;
 import tablesCreation.UsersCreation;
 
 public class PromoteCommand implements Command {
@@ -35,12 +38,12 @@ public class PromoteCommand implements Command {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter username: ");
         String username = scanner.nextLine().trim();
-        User promotedUser = authentication.promote(users, username);
-        if (promotedUser != null) {
+        try {
+            User promotedUser = authentication.promote(users, username);
             usersCreation.updateUser(promotedUser);
             System.out.println(username + " is now an administrator!");
-        } else {
-            System.out.println("Specified user does not exist!");
+        } catch(InvalidCredentialsException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

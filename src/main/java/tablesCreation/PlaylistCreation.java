@@ -129,7 +129,6 @@ public class PlaylistCreation extends DatabaseConnection{
             Connection connection = DatabaseConnection.getCurrentConnection();
             assert connection != null;
 
-            // Obținerea playlisturilor utilizatorului
             String playlistQuery = "SELECT * FROM Playlists WHERE user_id = ?";
             PreparedStatement playlistStmt = connection.prepareStatement(playlistQuery);
             playlistStmt.setInt(1, userId);
@@ -168,4 +167,8 @@ public class PlaylistCreation extends DatabaseConnection{
         return playlists;
     }
 
+    public static void main(String[] args) {
+        createPlaylistsTable();
+        createPlaylistSongsTable();
+    }
 }

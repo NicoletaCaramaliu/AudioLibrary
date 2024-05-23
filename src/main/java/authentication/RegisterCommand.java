@@ -2,6 +2,9 @@ package authentication;
 
 import java.util.List;
 import java.util.Scanner;
+
+import users.User;
+import exceptions.UserAlreadyExistsException;
 import tablesCreation.UsersCreation;
 
 public class RegisterCommand implements Command {
@@ -29,12 +32,12 @@ public class RegisterCommand implements Command {
         String email = scanner.nextLine();
         System.out.println("Enter email: ");
         String password = scanner.nextLine();
-        User newUser = authentication.register(users, username, password, email);
-        if (newUser != null) {
+        try {
+            User newUser = authentication.register(users, username, password, email);
             usersCreation.insertUser(newUser);
             users.add(newUser);
-        } else {
-            System.out.println("User with given username already exists! Please try again!");
+        } catch (UserAlreadyExistsException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

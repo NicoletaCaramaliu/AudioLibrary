@@ -2,6 +2,7 @@ package playlistManager;
 
 import authentication.Command;
 import authentication.SessionManager;
+import exceptions.InvalidPlaylistException;
 import songsManager.Song;
 import tablesCreation.PlaylistCreation;
 import tablesCreation.SongsCreation;
@@ -41,15 +42,23 @@ public class AddSongToPlaylistCommand implements Command{
 
         System.out.print("Enter playlist identifier: ");
         String playlistIdentifier = scanner.next();
-        scanner.nextLine(); // Consume the newline
+        scanner.nextLine();
 
         System.out.print("Enter song identifiers (separated by space): ");
         String[] songIdentifiers = scanner.nextLine().split(" ");
 
         if (method.equals("byName")) {
-            addSongsToPlaylistByName(playlistIdentifier, songIdentifiers);
+            try {
+                addSongsToPlaylistByName(playlistIdentifier, songIdentifiers);
+            } catch (InvalidPlaylistException e) {
+                System.out.println(e.getMessage());
+            }
         } else {
-            addSongsToPlaylistById(playlistIdentifier, songIdentifiers);
+            try {
+                addSongsToPlaylistById(playlistIdentifier, songIdentifiers);
+            } catch (InvalidPlaylistException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -57,12 +66,7 @@ public class AddSongToPlaylistCommand implements Command{
         Playlist playlist = playlists.stream()
                 .filter(p -> p.getName().equals(playlistName) && p.getUserId() == sessionManager.getCurrentUser().getUserId())
                 .findFirst()
-                .orElse(null);
-
-        if (playlist == null) {
-            System.out.println("The desired playlist does not exist.");
-            return;
-        }
+                .orElseThrow(() -> new InvalidPlaylistException("The name of the desired playlist does not exist."));
 
         addSongsToPlaylist(playlist, songIdentifiers);
     }
@@ -79,12 +83,7 @@ public class AddSongToPlaylistCommand implements Command{
         Playlist playlist = playlists.stream()
                 .filter(p -> p.getId() == id && p.getUserId() == sessionManager.getCurrentUser().getUserId())
                 .findFirst()
-                .orElse(null);
-
-        if (playlist == null) {
-            System.out.println("The desired playlist does not exist.");
-            return;
-        }
+                .orElseThrow(() -> new InvalidPlaylistException("The id of the desired playlist does not exist."));
 
         addSongsToPlaylist(playlist, songIdentifiers);
     }
