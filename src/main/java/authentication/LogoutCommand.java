@@ -1,15 +1,17 @@
 package authentication;
 
-public class LogoutCommand implements Command {
-    private final Authentication authentication;
+public class LogoutCommand extends AuthCommand {
+    private final SessionManager sessionManager;
 
-    public LogoutCommand(Authentication authentication) {
-        this.authentication = authentication;
+    public LogoutCommand(SessionManager sessionManager) {
+        super(sessionManager);
+        this.sessionManager = sessionManager;
     }
 
     @Override
     public void execute() {
-        String result = authentication.logout();
-        System.out.println(result);
+        requireLoggedIn();
+        sessionManager.setCurrentUser(null);
+        System.out.println("Successfully logged out.");
     }
 }

@@ -1,41 +1,61 @@
 package exportPlaylist;
 
 import authentication.Command;
+import authentication.SessionManager;
+import exceptions.InvalidExportFormatException;
+import exceptions.InvalidPlaylistException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Scanner;
 import playlistRepository.Playlist;
+import sessionVerification.BaseCommand;
 import songRepository.Song;
 import tablesCreation.PlaylistCreation;
 
-public class ExportPlaylistCommand implements Command {
-    private final String playlistIdentifier;
-    private final ExportFormat format;
+public class ExportPlaylistCommand extends BaseCommand implements Command {
     private final int currentUserId;
     private final PlaylistCreation playlistCreation;
     private final String currentUserName;
+    private final SessionManager session;
 
     public ExportPlaylistCommand(
-            String playlistIdentifier,
-            ExportFormat format,
             int currentUserId,
             PlaylistCreation playlistCreation,
-            String currentUserName) {
-        this.playlistIdentifier = playlistIdentifier;
-        this.format = format;
+            String currentUserName,
+            SessionManager session) {
+        super(session);
         this.currentUserId = currentUserId;
         this.playlistCreation = playlistCreation;
         this.currentUserName = currentUserName;
+        this.session = session;
     }
 
     @Override
     public void execute() {
-        Playlist playlist = getPlaylist();
+        Scanner scanner = new Scanner(System.in);
+        requireLoggedIn();
+
+        System.out.print("Enter playlist name or ID: ");
+        String playlistIdentifier = scanner.nextLine();
+
+        System.out.print("Enter export format (CSV/JSON): ");
+        String formatString = scanner.nextLine().toUpperCase();
+
+        ExportFormat format;
+        try {
+            format = ExportFormat.valueOf(formatString);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidExportFormatException(
+                    "Invalid format specified. Please enter CSV or JSON.");
+        }
+
+        Playlist playlist = getPlaylist(playlistIdentifier);
         if (playlist == null) {
-            System.out.println("Playlist " + playlistIdentifier + " does not exist!");
-            return;
+            throw new InvalidPlaylistException(
+                    "Playlist " + playlistIdentifier + " does not exist!");
         }
 
         try {
@@ -54,7 +74,7 @@ public class ExportPlaylistCommand implements Command {
         }
     }
 
-    private Playlist getPlaylist() {
+    private Playlist getPlaylist(String playlistIdentifier) {
         List<Playlist> userPlaylists = playlistCreation.getUserPlaylists(currentUserId);
         for (Playlist playlist : userPlaylists) {
             if (playlist.getName().equals(playlistIdentifier)
@@ -71,7 +91,7 @@ public class ExportPlaylistCommand implements Command {
         return "export_"
                 + currentUserName
                 + "_"
-                + playlistName
+                + playlistName.replaceAll("\\s+", "_")
                 + "_"
                 + date
                 + "."

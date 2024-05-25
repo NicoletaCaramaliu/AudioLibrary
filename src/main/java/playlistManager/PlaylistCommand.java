@@ -2,11 +2,11 @@ package playlistManager;
 
 import authentication.Command;
 import authentication.SessionManager;
-import exceptions.InvalidSessionException;
 import playlistRepository.PlaylistRepository;
+import sessionVerification.BaseCommand;
 import tablesCreation.PlaylistCreation;
 
-public abstract class PlaylistCommand implements Command {
+public abstract class PlaylistCommand extends BaseCommand implements Command {
     protected final SessionManager sessionManager;
     protected final PlaylistCreation playlistCreation;
     protected final PlaylistRepository playlistRepository;
@@ -15,15 +15,9 @@ public abstract class PlaylistCommand implements Command {
             SessionManager sessionManager,
             PlaylistCreation playlistCreation,
             PlaylistRepository playlistRepository) {
+        super(sessionManager);
         this.sessionManager = sessionManager;
         this.playlistCreation = playlistCreation;
         this.playlistRepository = playlistRepository;
-    }
-
-    protected void requireLoggedIn() {
-        if (sessionManager.getCurrentUser() == null) {
-            throw new InvalidSessionException(
-                    "You need to be logged in to perform this operation.");
-        }
     }
 }

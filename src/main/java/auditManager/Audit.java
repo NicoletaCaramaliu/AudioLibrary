@@ -1,8 +1,10 @@
 package auditManager;
 
+import lombok.Getter;
+
 public class Audit {
     private int auditId;
-    private final String username;
+    @Getter private final String username;
     private final String action;
     private final Boolean success;
 
@@ -11,5 +13,21 @@ public class Audit {
         this.username = username;
         this.action = action;
         this.success = success;
+    }
+
+    @Override
+    public String toString() {
+        return "Audit{"
+                + "auditId="
+                + auditId
+                + ", username='"
+                + username
+                + '\''
+                + ", action='"
+                + action
+                + '\''
+                + ", success="
+                + success
+                + '}';
     }
 }

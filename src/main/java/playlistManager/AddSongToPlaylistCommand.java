@@ -3,7 +3,6 @@ package playlistManager;
 import authentication.SessionManager;
 import exceptions.InvalidInputException;
 import exceptions.InvalidPlaylistException;
-import exceptions.InvalidSessionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -35,7 +34,7 @@ public class AddSongToPlaylistCommand extends PlaylistCommand {
         String method = scanner.next();
 
         if (!method.equals("byName") && !method.equals("byId")) {
-            throw new  InvalidInputException("Invalid method. Use 'byName' or 'byId'.");
+            throw new InvalidInputException("Invalid method. Use 'byName' or 'byId'.");
         }
 
         System.out.print("Enter playlist identifier: ");
@@ -47,10 +46,10 @@ public class AddSongToPlaylistCommand extends PlaylistCommand {
 
         if (method.equals("byName")) {
             addSongsToPlaylistByName(playlistIdentifier, songIdentifiers);
-        }else {addSongsToPlaylistById(playlistIdentifier, songIdentifiers);
+        } else {
+            addSongsToPlaylistById(playlistIdentifier, songIdentifiers);
         }
     }
-
 
     private void addSongsToPlaylistByName(String playlistName, String[] songIdentifiers) {
         Playlist playlist =

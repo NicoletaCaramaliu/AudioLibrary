@@ -96,7 +96,8 @@ public class PlaylistCreation extends DatabaseConnection {
 
     public void insertPlaylist(Playlist newPlaylist) {
         try (Connection connection = DatabaseConnection.getCurrentConnection()) {
-            String sql = "INSERT INTO Playlists ( playlist_id,playlist_name, user_id) VALUES (?, ?, ?)";
+            String sql =
+                    "INSERT INTO Playlists ( playlist_id,playlist_name, user_id) VALUES (?, ?, ?)";
             assert connection != null;
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, newPlaylist.getId());
@@ -172,8 +173,6 @@ public class PlaylistCreation extends DatabaseConnection {
         }
         return playlists;
     }
-
-
 
     public static void main(String[] args) {
         createPlaylistsTable();
