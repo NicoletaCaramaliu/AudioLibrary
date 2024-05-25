@@ -5,11 +5,9 @@ import auditManager.AuditCommand;
 import auditManager.AuditRepository;
 import auditManager.InMemoryAuditRepository;
 import authentication.*;
-import com.google.gson.reflect.TypeToken;
 import exceptions.*;
 import exportPlaylist.ExportPlaylistCommand;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -34,7 +32,6 @@ import users.User;
 
 public class Program implements ProgramRunner {
 
-
     @Override
     public void start() {
         UsersCreation usersCreation = new UsersCreation();
@@ -48,14 +45,11 @@ public class Program implements ProgramRunner {
         List<Playlist> playlists = new ArrayList<>(PlaylistCreation.getAllPlaylists());
         List<Audit> audits = new ArrayList<>(AuditCreation.getAudits());
 
-        //users from user file
+        // users from user file
         List<User> users = readUsersFromJsonFile("users.json");
         List<Song> songs = readSongsFromXmlFile("songs.xml");
 
-
         Scanner scanner = new Scanner(System.in);
-
-
 
         for (Playlist playlist : playlists) {
             playlistRepository.addPlaylist(playlist);
@@ -72,20 +66,20 @@ public class Program implements ProgramRunner {
         while (true) {
             System.out.print(
                     """
-                            Enter command:\s
-                            1. login
-                            2. register\s
-                            3. logout\s
-                            4. promote\s
-                            5. create song\s
-                            6. create playlist\s
-                            7. list playlists\s
-                            8. add song to playlist\s
-                            9. search song\s
-                            10. export playlist\s
-                            11. audit
-                            12. exit
-                            """);
+                    Enter command:\s
+                    1. login
+                    2. register\s
+                    3. logout\s
+                    4. promote\s
+                    5. create song\s
+                    6. create playlist\s
+                    7. list playlists\s
+                    8. add song to playlist\s
+                    9. search song\s
+                    10. export playlist\s
+                    11. audit
+                    12. exit
+                    """);
             String command = scanner.nextLine();
 
             Command action;
@@ -168,6 +162,7 @@ public class Program implements ProgramRunner {
             }
         }
     }
+
     private List<User> readUsersFromJsonFile(String fileName) {
         List<User> users = new ArrayList<>();
         try {
@@ -189,5 +184,4 @@ public class Program implements ProgramRunner {
         }
         return songs;
     }
-
 }

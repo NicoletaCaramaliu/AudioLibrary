@@ -128,6 +128,5 @@ public class SongsCreation {
     public static void main(String[] args) {
         createSongsTable();
         insertSongData();
-
     }
 }

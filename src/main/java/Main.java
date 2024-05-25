@@ -1,9 +1,10 @@
 import static readFileData.CreateFile.createFile;
 
 import authentication.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import exceptions.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import playlistManager.*;
 import programView.Program;
 import programView.ProgramRunner;
@@ -14,12 +15,6 @@ import songsManager.*;
 import tablesCreation.SongsCreation;
 import tablesCreation.UsersCreation;
 import users.User;
-
-import javax.sql.rowset.spi.XmlWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -34,8 +29,7 @@ public class Main {
             jsonUserUtility.writeData(users, "users.json");
         } catch (IOException e) {
             System.out.println(
-                    "Error occurred while writing users data to file: "
-                            + e.getMessage());
+                    "Error occurred while writing users data to file: " + e.getMessage());
         }
 
         XmlUtility<Song> xmlUtility = new XmlUtility<>(Song.class);
@@ -45,7 +39,8 @@ public class Main {
         try {
             xmlUtility.writeData(songs, filename);
         } catch (IOException e) {
-            System.err.println("Error occurred while writing songs data to file: " + e.getMessage());
+            System.err.println(
+                    "Error occurred while writing songs data to file: " + e.getMessage());
         }
 
         ProgramRunner program = new Program();
