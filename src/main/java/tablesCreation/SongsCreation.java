@@ -3,7 +3,7 @@ package tablesCreation;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import songsManager.Song;
+import songRepository.Song;
 
 public class SongsCreation {
     private static final String URL = "jdbc:mysql://localhost:3306/laborator";
@@ -108,12 +108,13 @@ public class SongsCreation {
     // CREATE NEW SONG
     public void insertSong(Song newSong) {
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "INSERT INTO Songs (song_name, artist, release_year) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO Songs (song_id, song_name, artist, release_year) VALUES (?,?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            statement.setString(1, newSong.title());
-            statement.setString(2, newSong.artist());
-            statement.setInt(3, newSong.releaseYear());
+            statement.setInt(1, newSong.songId());
+            statement.setString(2, newSong.title());
+            statement.setString(3, newSong.artist());
+            statement.setInt(4, newSong.releaseYear());
             statement.executeUpdate();
 
             System.out.println("Song " + newSong.title() + " inserted successfully");

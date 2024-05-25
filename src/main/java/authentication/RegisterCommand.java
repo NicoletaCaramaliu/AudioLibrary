@@ -1,11 +1,11 @@
 package authentication;
 
+import exceptions.InvalidSessionException;
+import exceptions.UserAlreadyExistsException;
 import java.util.List;
 import java.util.Scanner;
-
-import users.User;
-import exceptions.UserAlreadyExistsException;
 import tablesCreation.UsersCreation;
+import users.User;
 
 public class RegisterCommand implements Command {
     private final Authentication authentication;
@@ -22,8 +22,7 @@ public class RegisterCommand implements Command {
     @Override
     public void execute() {
         if (!authentication.session().isAnonymous()) {
-            System.out.println("You are already logged in.");
-            return;
+            throw new InvalidSessionException("You are already logged in.");
         }
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter username: ");
@@ -32,12 +31,10 @@ public class RegisterCommand implements Command {
         String email = scanner.nextLine();
         System.out.println("Enter email: ");
         String password = scanner.nextLine();
-        try {
-            User newUser = authentication.register(users, username, password, email);
-            usersCreation.insertUser(newUser);
-            users.add(newUser);
-        } catch (UserAlreadyExistsException e) {
-            System.out.println(e.getMessage());
-        }
+
+        User newUser = authentication.register(users, username, password, email);
+        usersCreation.insertUser(newUser);
+        users.add(newUser);
+
     }
 }

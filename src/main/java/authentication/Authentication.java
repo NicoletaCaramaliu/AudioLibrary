@@ -1,18 +1,19 @@
 package authentication;
 
+import exceptions.InvalidCredentialsException;
+import exceptions.InvalidSessionException;
+import exceptions.InvalidSongException;
+import exceptions.UserAlreadyExistsException;
 import java.util.List;
 import java.util.Objects;
-
 import users.Roles;
 import users.User;
-import exceptions.InvalidCredentialsException;
-import exceptions.UserAlreadyExistsException;
 
 public record Authentication(SessionManager session) implements AuthInterface {
 
     public String login(List<User> users, String username, String password) {
         if (!session.isAnonymous()) {
-            return "You are already logged in.";
+            throw new InvalidSessionException( "You are already logged in.");
         }
 
         for (User user : users) {
@@ -45,15 +46,13 @@ public record Authentication(SessionManager session) implements AuthInterface {
                         + username
                         + "\nYou are now authenticated as "
                         + username);
-
         return newUser;
     }
 
     public String logout() {
         if (session.isAnonymous()) {
-            return "You are not logged in.";
+            throw new InvalidSongException( "You are not logged in.");
         }
-
         session.setCurrentUser(null);
         return "Successfully logged out.";
     }

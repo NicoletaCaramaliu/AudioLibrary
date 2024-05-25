@@ -1,47 +1,42 @@
 package playlistManager;
 
-import authentication.Command;
 import authentication.SessionManager;
-import java.util.List;
-import java.util.Scanner;
-
 import exceptions.InvalidPlaylistException;
+import java.util.Scanner;
+import playlistRepository.Playlist;
+import playlistRepository.PlaylistRepository;
 import tablesCreation.PlaylistCreation;
 
-public class CreatePlaylistCommand implements Command {
-    private final List<Playlist> playlists;
-    private final CreatePlaylist createPlaylist;
-    private final PlaylistCreation playlistCreation;
-    private final SessionManager sessionManager;
-
+public class CreatePlaylistCommand extends PlaylistCommand {
     public CreatePlaylistCommand(
-            List<Playlist> playlists,
-            CreatePlaylist createPlaylist,
+            SessionManager sessionManager,
             PlaylistCreation playlistCreation,
-            SessionManager sessionManager) {
-        this.playlists = playlists;
-        this.createPlaylist = createPlaylist;
-        this.playlistCreation = playlistCreation;
-        this.sessionManager = sessionManager;
+            PlaylistRepository playlistRepository) {
+        super(sessionManager, playlistCreation, playlistRepository);
     }
 
     @Override
     public void execute() {
-        if (sessionManager.getCurrentUser() == null) {
-            System.out.println("You need to be logged in to create a playlist.");
-            return;
-        }
+        requireLoggedIn();
+
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter playlist name: ");
         String playlistName = scanner.nextLine();
-        try {
-            Playlist newPlaylist =
-                createPlaylist.addPlaylistToUser(playlists, playlistName);
 
-            playlists.add(newPlaylist);
-            playlistCreation.insertPlaylist(newPlaylist);
-        } catch(InvalidPlaylistException e) {
-            System.out.println(e.getMessage());
+        if (playlistRepository.playlistExists(
+                playlistName, sessionManager.getCurrentUser().getUserId())) {
+            throw new InvalidPlaylistException(
+                    "Playlist with name " + playlistName + " already exists.");
         }
+
+        Playlist newPlaylist =
+                new Playlist(
+                        playlistRepository.getAllPlaylists().size() + 1,
+                        playlistName,
+                        sessionManager.getCurrentUser().getUserId());
+
+        playlistRepository.addPlaylist(newPlaylist);
+        playlistCreation.insertPlaylist(newPlaylist);
+        System.out.println("Added " + playlistName + " to your playlists.");
     }
 }

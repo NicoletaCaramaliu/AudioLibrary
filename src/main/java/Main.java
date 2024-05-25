@@ -1,16 +1,19 @@
 import authentication.*;
+import exceptions.*;
+import exportPlaylist.ExportFormat;
+import exportPlaylist.ExportPlaylistCommand;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import exportPlaylist.ExportFormat;
-import exportPlaylist.ExportPlaylistCommand;
-import pagination.Paginator;
 import playlistManager.*;
-import songsManager.CreateSong;
-import songsManager.CreateSongCommand;
-import songsManager.SearchCommand;
-import songsManager.Song;
+import playlistRepository.InMemoryPlaylistRepository;
+import playlistRepository.Playlist;
+import playlistRepository.PlaylistRepository;
+import songRepository.InMemorySongRepository;
+import songRepository.Song;
+import songRepository.SongRepository;
+import songsManager.*;
+import tablesCreation.AuditCreation;
 import tablesCreation.PlaylistCreation;
 import tablesCreation.SongsCreation;
 import tablesCreation.UsersCreation;
@@ -21,24 +24,41 @@ public class Main {
         UsersCreation usersCreation = new UsersCreation();
         List<User> users = new ArrayList<>(UsersCreation.getAllUsers());
 
-        SongsCreation songsCreation = new SongsCreation();
-        List<Song> songs = new ArrayList<>(SongsCreation.getAllSongs());
-
-        PlaylistCreation playlistCreation = new PlaylistCreation();
-        List<Playlist> playlists = new ArrayList<>(PlaylistCreation.getAllPlaylists());
-
         SessionManager session = new SessionManager();
         Authentication auth = new Authentication(session);
-        CreateSong createSong = new CreateSong(session);
-        CreatePlaylist createPlaylist = new CreatePlaylist(session);
+
+        PlaylistRepository playlistRepository = new InMemoryPlaylistRepository();
+        List<Playlist> playlists = new ArrayList<>(PlaylistCreation.getAllPlaylists());
+        for (Playlist playlist : playlists) {
+            playlistRepository.addPlaylist(playlist);
+        }
+
+        SongsCreation songsCreation = new SongsCreation();
+        List<Song> songs = new ArrayList<>(SongsCreation.getAllSongs());
+        SongRepository songRepository = new InMemorySongRepository();
+        for (Song song : songs) {
+            songRepository.save(song);
+        }
+
+        PlaylistCreation playlistCreation = new PlaylistCreation();
         Scanner scanner = new Scanner(System.in);
 
         int itemsPerPage = 10;
 
         while (true) {
             System.out.print(
-                    "Enter command: \n1. login\n2. register \n3. logout \n4. promote \n5. create"
-                            + " song \n6. create playlist \n7. list playlists \n8. add song to playlist \n9. search song \n10. export playlist \n11. exit\n");
+                    "Enter command: \n"
+                            + "1. login\n"
+                            + "2. register \n"
+                            + "3. logout \n"
+                            + "4. promote \n"
+                            + "5. create song \n"
+                            + "6. create playlist \n"
+                            + "7. list playlists \n"
+                            + "8. add song to playlist \n"
+                            + "9. search song \n"
+                            + "10. export playlist \n"
+                            + "11. exit\n");
             String command = scanner.nextLine();
 
             Command action;
@@ -56,33 +76,25 @@ public class Main {
                     action = new PromoteCommand(auth, users, session, usersCreation);
                     break;
                 case "5":
-                    action = new CreateSongCommand(songs, createSong, songsCreation);
+                    action = new CreateSongCommand(session, songRepository, songsCreation);
                     break;
                 case "6":
                     action =
                             new CreatePlaylistCommand(
-                                    playlists, createPlaylist, playlistCreation, session);
+                                    session, playlistCreation, playlistRepository);
                     break;
                 case "7":
-                    if (session.getCurrentUser() == null) {
-                        System.out.println("You need to be logged in to view your playlists.");
-                        continue;
-                    }
-                    action = new ListPlaylistCommand(itemsPerPage, session.getCurrentUser().getUserId(), playlistCreation);
+                    action =
+                            new ListPlaylistCommand(
+                                    itemsPerPage, session, playlistCreation, playlistRepository);
                     break;
                 case "8":
-                    action = new AddSongToPlaylistCommand(playlists, songs, playlistCreation, songsCreation, session, scanner);
+                    action =
+                            new AddSongToPlaylistCommand(
+                                    session, playlistCreation, playlistRepository, songRepository);
                     break;
                 case "9":
-                    if(session.getCurrentUser() == null) {
-                        System.out.println("You need to be logged in to search songs.");
-                        continue;
-                    }
-                    System.out.print("Enter search type (author/name): ");
-                    String searchType = scanner.nextLine();
-                    System.out.print("Enter search criteria: ");
-                    String searchCriteria = scanner.nextLine();
-                    action = new SearchCommand(songs, itemsPerPage, searchType, searchCriteria);
+                    action = new SearchCommand(session, songRepository, itemsPerPage);
                     break;
                 case "10":
                     if (session.getCurrentUser() == null) {
@@ -100,7 +112,13 @@ public class Main {
                         System.out.println("Invalid format specified. Please enter CSV or JSON.");
                         continue;
                     }
-                    action = new ExportPlaylistCommand(playlistIdentifier, format, session.getCurrentUser().getUserId(), playlistCreation, session.getCurrentUser().getUsername());
+                    action =
+                            new ExportPlaylistCommand(
+                                    playlistIdentifier,
+                                    format,
+                                    session.getCurrentUser().getUserId(),
+                                    playlistCreation,
+                                    session.getCurrentUser().getUsername());
                     break;
                 case "11":
                     return;
@@ -109,9 +127,28 @@ public class Main {
                     continue;
             }
             try {
+                String commandName = action.getClass().getSimpleName();
                 action.execute();
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid usage of command " + command);
+                AuditCreation.insertAudit(
+                        session.getCurrentUser() != null
+                                ? session.getCurrentUser().getUsername()
+                                : "anonymous",
+                        commandName,
+                        true);
+            } catch (IllegalArgumentException
+                    | InvalidCredentialsException
+                    | UserAlreadyExistsException
+                    | InvalidSessionException
+                    | InvalidPlaylistException
+                    | InvalidSongException
+                    | InvalidInputException e) {
+                AuditCreation.insertAudit(
+                        session.getCurrentUser() != null
+                                ? session.getCurrentUser().getUsername()
+                                : "anonymous",
+                        action.getClass().getSimpleName(),
+                        false);
+                System.out.println(e.getMessage());
             }
         }
     }

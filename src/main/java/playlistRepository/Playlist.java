@@ -1,17 +1,17 @@
-package playlistManager;
-
-import lombok.Getter;
-import songsManager.Song;
+package playlistRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import songRepository.Song;
+
 @Getter
 public class Playlist {
     private final int id;
-    @Getter
-    private final String name;
+    @Getter private final String name;
     private final int userId;
-    private final List<Song> songs;
+    @Getter @Setter private List<Song> songs;
 
     public Playlist(int id, String name, int userId) {
         this.id = id;
@@ -19,7 +19,6 @@ public class Playlist {
         this.userId = userId;
         this.songs = new ArrayList<>();
     }
-
 
     public void addSong(Song song) {
         songs.add(song);
@@ -31,12 +30,16 @@ public class Playlist {
 
     @Override
     public String toString() {
-        return "Playlist{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", userId=" + userId +
-                ", songs=" + songs +
-                '}';
+        return "Playlist{"
+                + "id="
+                + id
+                + ", name='"
+                + name
+                + '\''
+                + ", userId="
+                + userId
+                + ", songs="
+                + songs
+                + '}';
     }
-
 }

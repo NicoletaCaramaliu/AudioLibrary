@@ -3,10 +3,10 @@ package tablesCreation;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import playlistManager.Playlist;
-import songsManager.Song;
+import playlistRepository.Playlist;
+import songRepository.Song;
 
-public class PlaylistCreation extends DatabaseConnection{
+public class PlaylistCreation extends DatabaseConnection {
 
     public static void createPlaylistsTable() {
         try {
@@ -15,7 +15,7 @@ public class PlaylistCreation extends DatabaseConnection{
             Statement statement = connection.createStatement();
             String createTableSQL =
                     "CREATE TABLE IF NOT EXISTS Playlists ("
-                            + "playlist_id INT AUTO_INCREMENT PRIMARY KEY,"
+                            + "playlist_id INT PRIMARY KEY,"
                             + "playlist_name VARCHAR(100) NOT NULL,"
                             + "user_id INT NOT NULL,"
                             + "FOREIGN KEY (user_id) REFERENCES Users(userId),"
@@ -46,7 +46,6 @@ public class PlaylistCreation extends DatabaseConnection{
         }
     }
 
-
     public static List<Playlist> getAllPlaylists() {
         List<Playlist> playlists = new ArrayList<>();
         try {
@@ -60,6 +59,10 @@ public class PlaylistCreation extends DatabaseConnection{
                 String playlistName = resultSet.getString("playlist_name");
                 int userId = resultSet.getInt("user_id");
                 Playlist playlist = new Playlist(playlistId, playlistName, userId);
+
+                List<Song> songs = getSongsForPlaylist(playlistId);
+                playlist.setSongs(songs);
+
                 playlists.add(playlist);
             }
         } catch (SQLException e) {
@@ -68,14 +71,37 @@ public class PlaylistCreation extends DatabaseConnection{
         return playlists;
     }
 
+    private static List<Song> getSongsForPlaylist(int playlistId) throws SQLException {
+        List<Song> songs = new ArrayList<>();
+        Connection connection = DatabaseConnection.getCurrentConnection();
+        assert connection != null;
+        String query =
+                "SELECT s.song_id, s.song_name, s.artist, s.release_year "
+                        + "FROM PlaylistSongs ps "
+                        + "JOIN Songs s ON ps.song_id = s.song_id "
+                        + "WHERE ps.playlist_id = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, playlistId);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            int songId = resultSet.getInt("song_id");
+            String title = resultSet.getString("song_name");
+            String artist = resultSet.getString("artist");
+            int releaseYear = resultSet.getInt("release_year");
+            Song song = new Song(songId, title, artist, releaseYear);
+            songs.add(song);
+        }
+        return songs;
+    }
+
     public void insertPlaylist(Playlist newPlaylist) {
         try (Connection connection = DatabaseConnection.getCurrentConnection()) {
-            String sql = "INSERT INTO Playlists ( playlist_name, user_id) VALUES (?, ?)";
+            String sql = "INSERT INTO Playlists ( playlist_id,playlist_name, user_id) VALUES (?, ?, ?)";
             assert connection != null;
             PreparedStatement statement = connection.prepareStatement(sql);
-
-            statement.setString(1, newPlaylist.getName());
-            statement.setInt(2, newPlaylist.getUserId());
+            statement.setInt(1, newPlaylist.getId());
+            statement.setString(2, newPlaylist.getName());
+            statement.setInt(3, newPlaylist.getUserId());
             statement.executeUpdate();
 
             System.out.println("Playlist " + newPlaylist.getName() + " inserted successfully");
@@ -92,35 +118,15 @@ public class PlaylistCreation extends DatabaseConnection{
             statement.setInt(1, playlistId);
             statement.setInt(2, songId);
             statement.executeUpdate();
-            System.out.println("Song with ID " + songId + " added to playlist with ID " + playlistId + " successfully.");
+            System.out.println(
+                    "Song with ID "
+                            + songId
+                            + " added to playlist with ID "
+                            + playlistId
+                            + " successfully.");
         } catch (SQLException e) {
             System.out.println("Error inserting song into playlist: " + e.getMessage());
         }
-    }
-
-    public List<Song> getSongsForPlaylist(int playlistId) {
-        List<Song> songs = new ArrayList<>();
-        try {
-            Connection connection = DatabaseConnection.getCurrentConnection();
-            assert connection != null;
-            String query = "SELECT s.song_id, s.title, s.artist, s.release_year " +
-                    "FROM PlaylistSongs ps " +
-                    "JOIN Songs s ON ps.song_id = s.song_id " +
-                    "WHERE ps.playlist_id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, playlistId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                int songId = resultSet.getInt("song_id");
-                String title = resultSet.getString("title");
-                String artist = resultSet.getString("artist");
-                int releaseYear = resultSet.getInt("release_year");
-                songs.add(new Song(songId, title, artist, releaseYear));
-            }
-        } catch (SQLException e) {
-            System.out.println("Error getting songs for playlist: " + e.getMessage());
-        }
-        return songs;
     }
 
     public List<Playlist> getUserPlaylists(int userId) {
@@ -140,11 +146,11 @@ public class PlaylistCreation extends DatabaseConnection{
 
                 Playlist playlist = new Playlist(playlistId, playlistName, userId);
 
-                // Obținerea melodiilor pentru fiecare playlist
-                String songQuery = "SELECT s.song_id, s.song_name, s.artist, s.release_year " +
-                        "FROM PlaylistSongs ps " +
-                        "JOIN Songs s ON ps.song_id = s.song_id " +
-                        "WHERE ps.playlist_id = ?";
+                String songQuery =
+                        "SELECT s.song_id, s.song_name, s.artist, s.release_year "
+                                + "FROM PlaylistSongs ps "
+                                + "JOIN Songs s ON ps.song_id = s.song_id "
+                                + "WHERE ps.playlist_id = ?";
                 PreparedStatement songStmt = connection.prepareStatement(songQuery);
                 songStmt.setInt(1, playlistId);
                 ResultSet songRS = songStmt.executeQuery();
@@ -166,6 +172,8 @@ public class PlaylistCreation extends DatabaseConnection{
         }
         return playlists;
     }
+
+
 
     public static void main(String[] args) {
         createPlaylistsTable();

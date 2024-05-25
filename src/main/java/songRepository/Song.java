@@ -1,8 +1,6 @@
-package songsManager;
+package songRepository;
 
 public record Song(int songId, String title, String artist, int releaseYear) {
-
-
     @Override
     public String toString() {
         return "Song{"
@@ -18,6 +16,4 @@ public record Song(int songId, String title, String artist, int releaseYear) {
                 + releaseYear
                 + '}';
     }
-
-
 }

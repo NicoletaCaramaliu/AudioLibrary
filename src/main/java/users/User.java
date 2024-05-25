@@ -9,8 +9,7 @@ public class User {
     private final String username;
     private final String password;
     private final String email;
-    @Setter
-    private Roles role;
+    @Setter private Roles role;
 
     public User(int userId, String username, String password, String email, Roles role) {
         this.userId = userId;
@@ -29,13 +28,20 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", role=" + role +
-                '}';
+        return "User{"
+                + "userId="
+                + userId
+                + ", username='"
+                + username
+                + '\''
+                + ", password='"
+                + password
+                + '\''
+                + ", email='"
+                + email
+                + '\''
+                + ", role="
+                + role
+                + '}';
     }
-
 }

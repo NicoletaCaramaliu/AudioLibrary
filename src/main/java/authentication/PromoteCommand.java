@@ -1,11 +1,13 @@
 package authentication;
 
+import exceptions.InvalidCredentialsException;
 import java.util.List;
 import java.util.Scanner;
 
-import users.User;
-import exceptions.InvalidCredentialsException;
+import exceptions.InvalidSessionException;
+import tablesCreation.AuditCreation;
 import tablesCreation.UsersCreation;
+import users.User;
 
 public class PromoteCommand implements Command {
     private final Authentication authentication;
@@ -27,23 +29,19 @@ public class PromoteCommand implements Command {
     @Override
     public void execute() {
         if (session.isAnonymous()) {
-            System.out.println("You are not logged in.");
-            return;
+            throw new InvalidSessionException("You are not logged in.");
+
         }
         if (!session.isAdmin()) {
-            System.out.println(
-                    "You do not have permission to promote. You are not an administrator.");
-            return;
+            AuditCreation.insertAudit(session.getCurrentUser().getUsername(), "promote", false);
+            throw new InvalidSessionException("You are not an administrator.");
         }
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter username: ");
         String username = scanner.nextLine().trim();
-        try {
-            User promotedUser = authentication.promote(users, username);
-            usersCreation.updateUser(promotedUser);
-            System.out.println(username + " is now an administrator!");
-        } catch(InvalidCredentialsException e) {
-            System.out.println(e.getMessage());
-        }
+        User promotedUser = authentication.promote(users, username);
+        usersCreation.updateUser(promotedUser);
+        System.out.println(username + " is now an administrator!");
+
     }
 }

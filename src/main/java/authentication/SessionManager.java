@@ -1,9 +1,9 @@
 package authentication;
 
-import users.Roles;
-import users.User;
 import lombok.Getter;
 import lombok.Setter;
+import users.Roles;
+import users.User;
 
 @Setter
 @Getter

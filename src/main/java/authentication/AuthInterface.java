@@ -1,8 +1,7 @@
 package authentication;
 
-import users.User;
-
 import java.util.List;
+import users.User;
 
 public interface AuthInterface {
     String login(List<User> users, String username, String password);

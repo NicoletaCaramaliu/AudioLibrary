@@ -1,47 +1,47 @@
 package songsManager;
 
-import authentication.Command;
-import pagination.Paginator;
-
+import authentication.SessionManager;
+import exceptions.InvalidInputException;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Scanner;
+import pagination.Paginator;
+import songRepository.Song;
+import songRepository.SongRepository;
 
-
-public class SearchCommand implements Command {
-    private final List<Song> songs;
+public class SearchCommand extends SongCommand {
     private final int itemsPerPage;
-    private final String searchType;
-    private final String searchCriteria;
 
-    public SearchCommand(List<Song> songs, int itemsPerPage, String searchType, String searchCriteria) {
-        this.songs = songs;
+    public SearchCommand(
+            SessionManager sessionManager, SongRepository repository, int itemsPerPage) {
+        super(sessionManager, repository);
         this.itemsPerPage = itemsPerPage;
-        this.searchType = searchType;
-        this.searchCriteria = searchCriteria;
     }
 
     @Override
     public void execute() {
-        List<Song> filteredSongs;
+        requireLoggedIn();
 
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter search type (author/name): ");
+        String searchType = scanner.nextLine();
+
+        if (!searchType.equalsIgnoreCase("author") && !searchType.equalsIgnoreCase("name")) {
+            throw new InvalidInputException("Invalid search type.");
+        }
+        System.out.print("Enter search criteria: ");
+        String searchCriteria = scanner.nextLine();
+
+        List<Song> filteredSongs;
         if (searchType.equalsIgnoreCase("author")) {
-            filteredSongs = songs.stream()
-                    .filter(song -> song.artist().toLowerCase().startsWith(searchCriteria.toLowerCase()))
-                    .collect(Collectors.toList());
-        } else if (searchType.equalsIgnoreCase("name")) {
-            filteredSongs = songs.stream()
-                    .filter(song -> song.title().toLowerCase().startsWith(searchCriteria.toLowerCase()))
-                    .collect(Collectors.toList());
+            filteredSongs = songRepository.findByArtist(searchCriteria);
         } else {
-            System.out.println("Invalid search type. Please use 'author' or 'name'.");
-            return;
+            filteredSongs = songRepository.findByTitle(searchCriteria);
         }
 
         if (filteredSongs.isEmpty()) {
-            System.out.println("Page 0 of 0 (0 items):");
+            System.out.println("No songs found matching the search criteria.");
             return;
         }
-
         Paginator<Song> paginator = new Paginator<>(filteredSongs, itemsPerPage);
         paginator.paginate();
     }

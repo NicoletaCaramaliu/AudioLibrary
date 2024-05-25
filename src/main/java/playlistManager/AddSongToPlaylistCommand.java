@@ -1,43 +1,41 @@
 package playlistManager;
 
-import authentication.Command;
 import authentication.SessionManager;
+import exceptions.InvalidInputException;
 import exceptions.InvalidPlaylistException;
-import songsManager.Song;
-import tablesCreation.PlaylistCreation;
-import tablesCreation.SongsCreation;
-
+import exceptions.InvalidSessionException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import playlistRepository.Playlist;
+import playlistRepository.PlaylistRepository;
+import songRepository.Song;
+import songRepository.SongRepository;
+import tablesCreation.PlaylistCreation;
 
-public class AddSongToPlaylistCommand implements Command{
-    private final List<Playlist> playlists;
-    private final List<Song> songs;
-    private final PlaylistCreation playlistCreation;
-    private final SessionManager sessionManager;
-    private final Scanner scanner;
+public class AddSongToPlaylistCommand extends PlaylistCommand {
+    private final SongRepository songRepository;
 
-    public AddSongToPlaylistCommand(List<Playlist> playlists, List<Song> songs, PlaylistCreation playlistCreation, SongsCreation songsCreation, SessionManager sessionManager, Scanner scanner) {
-        this.playlists = playlists;
-        this.songs = songs;
-        this.playlistCreation = playlistCreation;
-        this.sessionManager = sessionManager;
-        this.scanner = scanner;
+    public AddSongToPlaylistCommand(
+            SessionManager sessionManager,
+            PlaylistCreation playlistCreation,
+            PlaylistRepository playlistRepository,
+            SongRepository songRepository) {
+        super(sessionManager, playlistCreation, playlistRepository);
+        this.songRepository = songRepository;
     }
 
     @Override
     public void execute() {
-        if (sessionManager.getCurrentUser() == null) {
-            System.out.println("You need to be logged in to add songs to a playlist.");
-            return;
-        }
+        requireLoggedIn();
+
+        Scanner scanner = new Scanner(System.in);
 
         System.out.print("Enter command (byName/byId): ");
         String method = scanner.next();
 
         if (!method.equals("byName") && !method.equals("byId")) {
-            System.out.println("Invalid method. Use 'byName' or 'byId'.");
-            return;
+            throw new  InvalidInputException("Invalid method. Use 'byName' or 'byId'.");
         }
 
         System.out.print("Enter playlist identifier: ");
@@ -48,25 +46,22 @@ public class AddSongToPlaylistCommand implements Command{
         String[] songIdentifiers = scanner.nextLine().split(" ");
 
         if (method.equals("byName")) {
-            try {
-                addSongsToPlaylistByName(playlistIdentifier, songIdentifiers);
-            } catch (InvalidPlaylistException e) {
-                System.out.println(e.getMessage());
-            }
-        } else {
-            try {
-                addSongsToPlaylistById(playlistIdentifier, songIdentifiers);
-            } catch (InvalidPlaylistException e) {
-                System.out.println(e.getMessage());
-            }
+            addSongsToPlaylistByName(playlistIdentifier, songIdentifiers);
+        }else {addSongsToPlaylistById(playlistIdentifier, songIdentifiers);
         }
     }
 
+
     private void addSongsToPlaylistByName(String playlistName, String[] songIdentifiers) {
-        Playlist playlist = playlists.stream()
-                .filter(p -> p.getName().equals(playlistName) && p.getUserId() == sessionManager.getCurrentUser().getUserId())
-                .findFirst()
-                .orElseThrow(() -> new InvalidPlaylistException("The name of the desired playlist does not exist."));
+        Playlist playlist =
+                playlistRepository
+                        .findByNameAndUserId(
+                                playlistName, sessionManager.getCurrentUser().getUserId())
+                        .orElseThrow(
+                                () ->
+                                        new InvalidPlaylistException(
+                                                "The name of the desired playlist does not exist in"
+                                                        + " your list."));
 
         addSongsToPlaylist(playlist, songIdentifiers);
     }
@@ -80,54 +75,71 @@ public class AddSongToPlaylistCommand implements Command{
             return;
         }
 
-        Playlist playlist = playlists.stream()
-                .filter(p -> p.getId() == id && p.getUserId() == sessionManager.getCurrentUser().getUserId())
-                .findFirst()
-                .orElseThrow(() -> new InvalidPlaylistException("The id of the desired playlist does not exist."));
+        Playlist playlist =
+                playlistRepository
+                        .findByIdAndUserId(id, sessionManager.getCurrentUser().getUserId())
+                        .orElseThrow(
+                                () ->
+                                        new InvalidPlaylistException(
+                                                "The id of the desired playlist does not exist in"
+                                                        + " your list."));
 
         addSongsToPlaylist(playlist, songIdentifiers);
     }
 
     private void addSongsToPlaylist(Playlist playlist, String[] songIdentifiers) {
-        List<Integer> songIds = songs.stream()
-                .map(Song::songId)
-                .toList();
+        List<Song> songs = songRepository.findAll();
+        List<Integer> songIds = songs.stream().map(Song::songId).toList();
 
-        List<Song> songsToAdd = songs.stream()
-                .filter(song -> {
-                    for (String id : songIdentifiers) {
-                        if (song.songId() == Integer.parseInt(id)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                })
-                .toList();
+        List<Song> songsToAdd = songRepository.findByIdentifiers(songIdentifiers);
 
-        List<String> invalidSongs = songsToAdd.stream()
-                .filter(song -> !songIds.contains(song.songId()))
-                .map(Song::title)
-                .toList();
-
-        if (!invalidSongs.isEmpty()) {
-            invalidSongs.forEach(name -> System.out.println("Song with identifier " + name + " does not exist."));
-            return;
+        List<String> invalidIdentifiers = new ArrayList<>();
+        for (String identifier : songIdentifiers) {
+            if (!songIds.contains(Integer.parseInt(identifier))) {
+                invalidIdentifiers.add(identifier);
+            }
         }
 
-        List<Song> existingSongs = songsToAdd.stream()
-                .filter(song -> playlist.containsSong(song.songId()))
-                .toList();
+        if (!invalidIdentifiers.isEmpty()) {
+            invalidIdentifiers.forEach(
+                    name ->
+                            System.out.println(
+                                    "Song with identifier " + name + " does not exist."));
+        }
+
+        List<Song> existingSongs =
+                songsToAdd.stream().filter(song -> playlist.containsSong(song.songId())).toList();
+
+        songsToAdd =
+                songsToAdd.stream().filter(song -> !playlist.containsSong(song.songId())).toList();
 
         if (!existingSongs.isEmpty()) {
-            existingSongs.forEach(song -> System.out.println("The song \"" + song.title() + "\" by \"" + song.artist() + "\" is already part of \"" + playlist.getName() + "\"."));
-            return;
+            existingSongs.forEach(
+                    song ->
+                            System.out.println(
+                                    "The song \""
+                                            + song.title()
+                                            + "\" by \""
+                                            + song.artist()
+                                            + "\" is already part of \""
+                                            + playlist.getName()
+                                            + "\"."));
         }
 
-        songsToAdd.forEach(song -> {
-            playlist.addSong(song);
-            playlistCreation.insertPlaylistSong(playlist.getId(), song.songId());
-            System.out.println("Added \"" + song.title() + "\" by " + song.artist() + " to " + playlist.getName() + ".");
-        });
+        if (!songsToAdd.isEmpty()) {
+            songsToAdd.forEach(
+                    song -> {
+                        playlist.addSong(song);
+                        playlistCreation.insertPlaylistSong(playlist.getId(), song.songId());
+                        System.out.println(
+                                "Added \""
+                                        + song.title()
+                                        + "\" by "
+                                        + song.artist()
+                                        + " to "
+                                        + playlist.getName()
+                                        + ".");
+                    });
+        }
     }
-
 }

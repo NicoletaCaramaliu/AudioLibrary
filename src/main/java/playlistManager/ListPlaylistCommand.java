@@ -1,32 +1,37 @@
 package playlistManager;
 
-import authentication.Command;
+import authentication.SessionManager;
+import java.util.List;
 import pagination.Paginator;
+import playlistRepository.Playlist;
+import playlistRepository.PlaylistRepository;
 import tablesCreation.PlaylistCreation;
 
-import java.util.List;
-
-public class ListPlaylistCommand implements Command {
+public class ListPlaylistCommand extends PlaylistCommand {
     private final int itemsPerPage;
-    private final int currentUserId;
-    private final PlaylistCreation playlistCreation;
 
-    public ListPlaylistCommand(int itemsPerPage, int userId, PlaylistCreation playlistCreation) {
+    public ListPlaylistCommand(
+            int itemsPerPage,
+            SessionManager sessionManager,
+            PlaylistCreation playlistCreation,
+            PlaylistRepository playlistRepository) {
+        super(sessionManager, playlistCreation, playlistRepository);
         this.itemsPerPage = itemsPerPage;
-        this.currentUserId = userId;
-        this.playlistCreation = playlistCreation;
     }
 
     @Override
     public void execute() {
-        List<Playlist> userPlaylists = playlistCreation.getUserPlaylists(currentUserId);
+        requireLoggedIn();
+
+        List<Playlist> userPlaylists =
+                playlistRepository.getAllPlaylistsByUserId(
+                        sessionManager.getCurrentUser().getUserId());
 
         if (userPlaylists.isEmpty()) {
             System.out.println("You don't have any playlists.");
             return;
         }
 
-        // Afisarea paginată a playlisturilor
         Paginator<Playlist> paginator = new Paginator<>(userPlaylists, itemsPerPage);
         paginator.paginate();
     }

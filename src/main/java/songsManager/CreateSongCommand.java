@@ -1,26 +1,28 @@
 package songsManager;
 
-import authentication.Command;
+import authentication.SessionManager;
+import exceptions.InvalidSongException;
 import java.util.List;
 import java.util.Scanner;
-
-import exceptions.InvalidSessionException;
-import exceptions.InvalidSongException;
+import songRepository.Song;
+import songRepository.SongRepository;
 import tablesCreation.SongsCreation;
 
-public class CreateSongCommand implements Command {
-    private final List<Song> songs;
-    private final CreateSong createSong;
+public class CreateSongCommand extends SongCommand {
     private final SongsCreation songsCreation;
 
-    public CreateSongCommand(List<Song> songs, CreateSong createSong, SongsCreation songsCreation) {
-        this.songs = songs;
-        this.createSong = createSong;
+    public CreateSongCommand(
+            SessionManager sessionManager, SongRepository repository, SongsCreation songsCreation) {
+        super(sessionManager, repository);
         this.songsCreation = songsCreation;
     }
 
     @Override
     public void execute() {
+
+        requireLoggedIn();
+        requireAdmin();
+
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter song name: ");
         String songName = scanner.nextLine();
@@ -28,13 +30,15 @@ public class CreateSongCommand implements Command {
         String artist = scanner.nextLine();
         System.out.print("Enter release year: ");
         int releaseYear = Integer.parseInt(scanner.nextLine());
-        try {
-            Song newSong =
-                    createSong.addSongToLibrary(songs, songName, artist, releaseYear, songsCreation);
-                songs.add(newSong);
-                songsCreation.insertSong(newSong);
-        } catch (InvalidSongException | InvalidSessionException e) {
-            System.out.println(e.getMessage());
+
+        List<Song> existingSongs = songRepository.findByTitleAndArtist(songName, artist);
+        if (!existingSongs.isEmpty()) {
+            throw new InvalidSongException("Song already exists in the library.");
         }
+        int songId = songRepository.findAll().size() + 1;
+        Song newSong = new Song(songId, songName, artist, releaseYear);
+        songRepository.save(newSong);
+        songsCreation.insertSong(newSong);
+        System.out.println("Added " + songName + " by " + artist + " to the library.");
     }
 }

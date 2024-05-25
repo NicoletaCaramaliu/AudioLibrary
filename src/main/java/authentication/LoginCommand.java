@@ -1,10 +1,9 @@
 package authentication;
 
-import users.User;
 import exceptions.InvalidCredentialsException;
-
 import java.util.List;
 import java.util.Scanner;
+import users.User;
 
 public class LoginCommand implements Command {
     private final Authentication auth;
@@ -23,12 +22,8 @@ public class LoginCommand implements Command {
         String loginUsername = scanner.nextLine();
         System.out.println("Enter password: ");
         String loginPassword = scanner.nextLine();
-        try {
-            String loginResult = auth.login(users, loginUsername, loginPassword);
-            System.out.println(loginResult);
 
-        } catch (InvalidCredentialsException e) {
-            System.out.println(e.getMessage());
-        }
+        String loginResult = auth.login(users, loginUsername, loginPassword);
+        System.out.println(loginResult);
     }
 }

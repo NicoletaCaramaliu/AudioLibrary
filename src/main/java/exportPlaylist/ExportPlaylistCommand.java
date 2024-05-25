@@ -1,15 +1,14 @@
 package exportPlaylist;
 
 import authentication.Command;
-import playlistManager.Playlist;
-import songsManager.Song;
-import tablesCreation.PlaylistCreation;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import playlistRepository.Playlist;
+import songRepository.Song;
+import tablesCreation.PlaylistCreation;
 
 public class ExportPlaylistCommand implements Command {
     private final String playlistIdentifier;
@@ -18,7 +17,12 @@ public class ExportPlaylistCommand implements Command {
     private final PlaylistCreation playlistCreation;
     private final String currentUserName;
 
-    public ExportPlaylistCommand(String playlistIdentifier, ExportFormat format, int currentUserId, PlaylistCreation playlistCreation, String currentUserName) {
+    public ExportPlaylistCommand(
+            String playlistIdentifier,
+            ExportFormat format,
+            int currentUserId,
+            PlaylistCreation playlistCreation,
+            String currentUserName) {
         this.playlistIdentifier = playlistIdentifier;
         this.format = format;
         this.currentUserId = currentUserId;
@@ -53,7 +57,8 @@ public class ExportPlaylistCommand implements Command {
     private Playlist getPlaylist() {
         List<Playlist> userPlaylists = playlistCreation.getUserPlaylists(currentUserId);
         for (Playlist playlist : userPlaylists) {
-            if (playlist.getName().equals(playlistIdentifier) || String.valueOf(playlist.getId()).equals(playlistIdentifier)) {
+            if (playlist.getName().equals(playlistIdentifier)
+                    || String.valueOf(playlist.getId()).equals(playlistIdentifier)) {
                 return playlist;
             }
         }
@@ -63,7 +68,14 @@ public class ExportPlaylistCommand implements Command {
     private String generateFilename(String playlistName, ExportFormat format) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String date = LocalDate.now().format(formatter);
-        return "export_" + currentUserName + "_" + playlistName + "_" + date + "." + format.name().toLowerCase();
+        return "export_"
+                + currentUserName
+                + "_"
+                + playlistName
+                + "_"
+                + date
+                + "."
+                + format.name().toLowerCase();
     }
 
     private void exportToCSV(Playlist playlist, String filename) throws IOException {
